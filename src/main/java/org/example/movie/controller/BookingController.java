@@ -28,17 +28,6 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @Operation(summary = "Add a new movie", description = "Adds a new movie with specified schedules")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Movie added successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
-    @PostMapping("/api/admin/movies")
-    public ResponseEntity<Movie> addMovie(@RequestBody AddMovieRequest request) {
-        Movie movie = bookingService.addMovie(request);
-        return ResponseEntity.ok(movie);
-    }
 
     @Operation(summary = "Get list of movies", description = "Retrieves a list of current movies, optionally filtered by search query")
     @ApiResponses(value = {

@@ -1,9 +1,13 @@
 package org.example.movie.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.example.movie.dto.request.AddMovieRequest;
 import org.example.movie.dto.request.UpdateMovieRequest;
 import org.example.movie.dto.response.MovieResponse;
 
+import org.example.movie.entity.Movie;
 import org.example.movie.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -24,12 +28,19 @@ public class MovieController {
     public ResponseEntity<List<MovieResponse>> getMovieList(@RequestParam(required = false) String search) {
         return ResponseEntity.ok(movieService.getMovieList(search));
     }
+    @Operation(summary = "Add a new movie", description = "Adds a new movie with specified schedules")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Movie added successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @PostMapping("/add")
+    public ResponseEntity<Movie> addMovie(@RequestBody AddMovieRequest request) {
+        Movie movie = movieService.addMovie(request);
+        return ResponseEntity.ok(movie);
+    }
 
-//    @PostMapping
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<String> addMovie(@RequestBody AddMovieRequest request) {
-//        return ResponseEntity.ok(movieService.addMovie(request));
-//    }
+
 
     @PutMapping("/{movieId}")
     @PreAuthorize("hasRole('ADMIN')")

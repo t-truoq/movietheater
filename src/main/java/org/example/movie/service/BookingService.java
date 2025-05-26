@@ -2,7 +2,6 @@ package org.example.movie.service;
 
 import jakarta.transaction.Transactional;
 import org.example.movie.configuration.JwtUtil;
-import org.example.movie.dto.request.AddMovieRequest;
 import org.example.movie.dto.request.BookingSearchRequest;
 import org.example.movie.dto.request.SelectSeatsRequest;
 import org.example.movie.dto.request.TicketConfirmationRequest;
@@ -16,16 +15,15 @@ import org.example.movie.mapper.MovieMapper;
 import org.example.movie.mapper.ScheduleSeatMapper;
 import org.example.movie.mapper.TicketMapper;
 import org.example.movie.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
@@ -67,21 +65,6 @@ public class BookingService {
     private ScheduleSeatMapper scheduleSeatMapper;
 
     @Autowired
-    private ScheduleRepository scheduleRepository;
-
-    @Autowired
-    private ShowDateRepository showDateRepository;
-
-    @Autowired
-    private TypeRepository typeRepository;
-
-    @Autowired
-    private CinemaRoomRepository cinemaRoomRepository;
-
-    @Autowired
-    private MovieTypeRepository movieTypeRepository;
-
-    @Autowired
     private MovieMapper movieMapper;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BookingService.class);
@@ -121,94 +104,6 @@ public class BookingService {
         }
     }
 
-    @Transactional
-    public Movie addMovie(AddMovieRequest request) {
-        if (request.getMovieNameVn() == null || request.getMovieNameVn().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_REQUEST, "Movie name (VN) is required");
-        }
-        if (request.getFromDate() == null || request.getToDate() == null) {
-            throw new AppException(ErrorCode.INVALID_REQUEST, "From date and to date are required");
-        }
-        if (request.getFromDate().isAfter(request.getToDate())) {
-            throw new AppException(ErrorCode.INVALID_REQUEST, "From date must be before to date");
-        }
-        if (request.getScheduleTimes() == null || request.getScheduleTimes().isEmpty()) {
-            throw new AppException(ErrorCode.INVALID_REQUEST, "At least one schedule time is required");
-        }
-
-        Movie movie = new Movie();
-        movie.setMovieNameVn(request.getMovieNameVn());
-        movie.setMovieNameEnglish(request.getMovieNameEnglish());
-        movie.setFromDate(request.getFromDate());
-        movie.setToDate(request.getToDate());
-        movie.setActor(request.getActor());
-        movie.setMovieProductionCompany(request.getMovieProductionCompany());
-        movie.setDirector(request.getDirector());
-        movie.setDuration(request.getDuration());
-        movie.setVersion(request.getVersion());
-        movie.setContent(request.getContent());
-        movie.setLargeImage(request.getLargeImage());
-        CinemaRoom cinemaRoom = cinemaRoomRepository.findById(request.getCinemaRoom())
-                .orElseThrow(() -> new AppException(ErrorCode.CINEMA_ROOM_NOT_FOUND));
-        movie.setCinemaRoom(cinemaRoom);
-        movie = movieRepository.save(movie);
-
-        if (request.getTypeIds() != null && !request.getTypeIds().isEmpty()) {
-            for (Long typeId : request.getTypeIds()) {
-                Type type = typeRepository.findById(typeId)
-                        .orElseThrow(() -> new AppException(ErrorCode.TYPE_NOT_FOUND));
-                MovieType movieType = MovieType.builder()
-                        .movie(movie)
-                        .type(type)
-                        .build();
-                movieTypeRepository.save(movieType);
-            }
-        }
-
-        LocalDate currentDate = request.getFromDate();
-        while (!currentDate.isAfter(request.getToDate())) {
-            ShowDate showDate = ShowDate.builder()
-                    .showDate(currentDate)
-                    .build();
-            showDate = showDateRepository.save(showDate);
-
-            MovieDate movieDate = MovieDate.builder()
-                    .movie(movie)
-                    .showDate(showDate)
-                    .build();
-            movieDateRepository.save(movieDate);
-
-            currentDate = currentDate.plusDays(1);
-        }
-
-        // Định dạng chuẩn cho scheduleTime
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
-        for (LocalDateTime scheduleTime : request.getScheduleTimes()) {
-            LocalDate scheduleDate = scheduleTime.toLocalDate();
-            if (scheduleDate.isBefore(request.getFromDate()) || scheduleDate.isAfter(request.getToDate())) {
-                LOGGER.warn("Schedule time {} is outside the movie date range ({} to {}), skipping",
-                        scheduleTime, request.getFromDate(), request.getToDate());
-                continue;
-            }
-
-            // Định dạng scheduleTime trước khi lưu
-            String formattedScheduleTime = scheduleTime.format(formatter);
-            Schedule schedule = Schedule.builder()
-                    .scheduleTime(formattedScheduleTime)
-                    .build();
-            schedule = scheduleRepository.save(schedule);
-
-            MovieSchedule movieSchedule = MovieSchedule.builder()
-                    .movie(movie)
-                    .schedule(schedule)
-                    .build();
-            movieScheduleRepository.save(movieSchedule);
-        }
-
-        return movie;
-    }
-
     public List<MovieResponse> getMovies(String query) {
         List<Movie> movies = query == null || query.isEmpty()
                 ? movieRepository.findAll()
@@ -224,7 +119,6 @@ public class BookingService {
         List<MovieDate> movieDates = movieDateRepository.findByMovie_MovieId(movieId);
         List<MovieSchedule> movieSchedules = movieScheduleRepository.findByMovie_MovieId(movieId);
 
-        // Tạo DateTimeFormatter hỗ trợ định dạng không có giây
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd'T'HH:mm")
                 .optionalStart()
@@ -284,7 +178,6 @@ public class BookingService {
         List<MovieSchedule> movieSchedules = movieScheduleRepository.findByMovie_MovieId(movieId);
         LOGGER.debug("Found {} schedules for movieId: {}", movieSchedules.size(), movieId);
 
-        // Tạo DateTimeFormatter hỗ trợ định dạng không có giây
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd'T'HH:mm")
                 .optionalStart()
@@ -360,7 +253,6 @@ public class BookingService {
                 .stream().findFirst()
                 .orElseThrow(() -> new AppException(ErrorCode.SHOWTIME_NOT_FOUND));
 
-        // Tạo DateTimeFormatter hỗ trợ định dạng không có giây
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd'T'HH:mm")
                 .optionalStart()
