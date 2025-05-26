@@ -17,7 +17,9 @@ import java.util.List;
 public class Invoice {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "INVOICE_ID", length = 10)
+
     private Long invoiceId;
 
     @Column(name = "ADD_SCORE")

@@ -154,7 +154,7 @@ public class AccountController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/public/accounts/{id}")
+    @GetMapping("/admin/accounts/{id}")
     @Operation(summary = "Get account by ID", description = "Retrieves the account details of a specific user by their ID. Publicly accessible.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Account retrieved successfully",

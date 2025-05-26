@@ -91,13 +91,18 @@ public class CinemaRoomService {
         int cols = seatQuantity / rows;
         char[] columns = {'A', 'B', 'C', 'D', 'E', 'F'};
 
-        for (int row = 1; row <= rows; row++) {
-            for (int col = 0; col < Math.min(cols, columns.length); col++) {
+        for (int col = 0; col < Math.min(cols, columns.length); col++) {
+            for (int row = 1; row <= rows; row++) {
+                // Ghế ở hai hàng đầu (1, 2) hoặc hai cột rìa (đầu hoặc cuối) là REGULAR
+                SeatType seatType = (row <= 2 || col == 0 || col == Math.min(cols, columns.length) - 1)
+                        ? SeatType.REGULAR
+                        : SeatType.VIP;
+
                 Seat seat = Seat.builder()
                         .seatColumn(String.valueOf(columns[col]))
                         .seatRow(row)
                         .seatStatus(SeatStatus.AVAILABLE)
-                        .seatType(SeatType.REGULAR)
+                        .seatType(seatType)
                         .cinemaRoom(cinemaRoom)
                         .build();
                 seats.add(seat);

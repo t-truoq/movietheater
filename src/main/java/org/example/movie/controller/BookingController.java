@@ -35,8 +35,12 @@ public class BookingController {
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
     @GetMapping("/api/public/movies")
-    public ResponseEntity<List<MovieResponse>> getMovies(@RequestParam(required = false) String q) {
-        return ResponseEntity.ok(bookingService.getMovies(q));
+    public ResponseEntity<?> getMovies(@RequestParam(required = false) String q) {
+        List<MovieResponse> movies = bookingService.getMovies(q);
+        if (movies.isEmpty()) {
+            return ResponseEntity.ok("Không tìm thấy phim nào khớp với truy vấn.");
+        }
+        return ResponseEntity.ok(movies);
     }
 
     @Operation(summary = "Get available show dates for a movie", description = "Retrieves a list of available show dates for a specific movie")

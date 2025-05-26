@@ -11,5 +11,5 @@ public class    TicketConfirmationResponse {
     private LocalDate scheduleShowDate;
     private String scheduleShowTime;
     private List<String> seatNumbers; // seatColumn + seatRow
-    private Integer totalScore;
+    private Integer totalPrice;
 }

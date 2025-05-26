@@ -107,7 +107,7 @@ public class BookingService {
     public List<MovieResponse> getMovies(String query) {
         List<Movie> movies = query == null || query.isEmpty()
                 ? movieRepository.findAll()
-                : movieRepository.findByMovieNameVnContainingIgnoreCase(query);
+                : movieRepository.findByMovieNameVnContainingIgnoreCaseOrMovieNameEnglishContainingIgnoreCase(query, query);
         return movies.stream()
                 .map(movieMapper::toResponse)
                 .toList();

@@ -21,7 +21,7 @@ public interface TicketMapper {
     @Mapping(source = "invoice.scheduleShowTime", target = "scheduleShowDate", qualifiedByName = "toLocalDate")
     @Mapping(source = "invoice.scheduleShowTime", target = "scheduleShowTime", qualifiedByName = "toStringTime")
     @Mapping(source = "invoice.seat", target = "seatNumbers", qualifiedByName = "splitSeatString")
-    @Mapping(source = "invoice.totalMoney", target = "totalScore")
+    @Mapping(source = "invoice.totalMoney", target = "totalPrice")
     TicketConfirmationResponse toConfirmationResponse(Invoice invoice);
 
     @Mapping(source = "invoice.invoiceId", target = "bookingId")
