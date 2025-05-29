@@ -19,8 +19,12 @@ public class TicketConfirmationRequest {
     @NotNull(message = "Schedule ID Not Null")
     private Long scheduleId;
 
-    @Min(value = 0, message = "Must be > 0")
+    @Min(value = 0, message = "Must be >= 0")
     private Integer useScore;
 
     private Long promotionId;
+
+    private String identityCard;
+
+    private String phoneNumber;
 }

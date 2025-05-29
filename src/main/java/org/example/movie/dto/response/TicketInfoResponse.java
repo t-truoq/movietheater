@@ -9,12 +9,12 @@ import java.util.List;
 public class TicketInfoResponse {
     private Long bookingId;
     private String movieName;
-    private String screen;
+    private String cinemaRoomName;
     private LocalDateTime date;
     private LocalDateTime time;
     private List<String> seat;
     private Integer price;
-    private Integer scoreForTicketConverting; // Điểm đã sử dụng
+    private Integer scoreForTicketConverting;
     private Integer total;
     private Long memberId;
     private String fullName;

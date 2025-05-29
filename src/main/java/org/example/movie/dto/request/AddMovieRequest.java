@@ -1,5 +1,6 @@
 package org.example.movie.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -10,7 +11,9 @@ import java.util.List;
 public class AddMovieRequest {
     private String movieNameVn;
     private String movieNameEnglish;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fromDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate toDate;
     private String actor;
     private String movieProductionCompany;
@@ -21,5 +24,6 @@ public class AddMovieRequest {
     private Long cinemaRoom;
     private String content;
     private String largeImage;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private List<LocalDateTime> scheduleTimes;
 }

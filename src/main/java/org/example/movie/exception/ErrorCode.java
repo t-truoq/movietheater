@@ -46,7 +46,8 @@ public enum ErrorCode {
     MOVIE_IN_USE(1032, "Movie is currently in use and cannot be deleted"),
     INVALID_MOVIE_DATA(1033, "Invalid movie data"),
     PROMOTION_NOT_FOUND(1034, "Promotion not found"),
-    INVALID_REQUEST(1035, "Invalid request"),;;
+    INVALID_REQUEST(1035, "Invalid request"),
+    SCHEDULE_SEAT_NOT_FOUND(1036, "Schedule seat not found"),;
 
     private final int code;
     private final String message;

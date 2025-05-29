@@ -7,6 +7,10 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  jackson:
+    date-format: yyyy-MM-dd HH:mm
+    serialization:
+      write-dates-as-timestamps: false
 
 jwt:
   signerKey: "3aF+lAiyA/tEAeeBtmlou0RwdTwXx0lU6SjH0MYBR7DRt9vyJzlv66uqnqHMP2NW"
@@ -22,3 +26,4 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
+
